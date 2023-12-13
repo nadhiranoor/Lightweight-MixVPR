@@ -22,7 +22,9 @@ def get_backbone(backbone_arch='resnet50',
     """
     if 'resnet' in backbone_arch.lower():
         return backbones.ResNet(backbone_arch, pretrained, layers_to_freeze, layers_to_crop)
-
+    
+    if 'mobilenet_v2' is backbone_arch:    
+        return backbones.MobileNetV2()
     elif 'efficient' in backbone_arch.lower():
         if '_b' in backbone_arch.lower():
             return backbones.EfficientNet(backbone_arch, pretrained, layers_to_freeze+2)

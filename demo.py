@@ -13,6 +13,7 @@ import cv2
 from main import VPRModel
 
 
+
 class BaseDataset(data.Dataset):
     """Dataset with images from database and queries, used for inference (testing and building cache).
     """
@@ -25,10 +26,10 @@ class BaseDataset(data.Dataset):
         if 'query' in self.img_path:
             img_path_list = glob.glob(self.img_path + '/**/**/*.jpg', recursive=True)
             self.img_path_list = img_path_list
-        elif 'db' in self.img_path:
+        elif 'database' in self.img_path:
             img_path_list = glob.glob(self.img_path + '/**/**/*.jpg', recursive=True)
             # sort images for db
-            self.img_path_list = sorted(img_path_list, key=lambda x: int(os.path.splitext(os.path.basename(x))[0]))
+            self.img_path_list = img_path_list #sorted(img_path_list, key=lambda x: int(os.path.splitext(os.path.basename(x))[0]))
         else:
             raise ValueError('img_path should be either query or db')
         assert len(self.img_path_list) > 0, f'No images found in {self.img_path}'
@@ -59,9 +60,9 @@ class InferencePipeline:
 
     def run(self, split: str = 'db') -> np.ndarray:
 
-        if os.path.exists(f'./LOGS/global_descriptors_{split}.npy'):
+        if os.path.exists(f'logs/global_descriptors_{split}.npy'):
             print(f"Skipping {split} features extraction, loading from cache")
-            return np.load(f'./LOGS/global_descriptors_{split}.npy')
+            return np.load(f'logs/global_descriptors_{split}.npy')
 
         self.model.to(self.device)
         with torch.no_grad():
@@ -78,7 +79,7 @@ class InferencePipeline:
                 global_descriptors[np.array(indices), :] = descriptors
 
         # save global descriptors
-        np.save(f'./LOGS/global_descriptors_{split}.npy', global_descriptors)
+        np.save(f'logs/global_descriptors_{split}.npy', global_descriptors)
         return global_descriptors
 
 
@@ -147,7 +148,7 @@ def record_matches(top_k_matches: np.ndarray,
 def visualize(top_k_matches: np.ndarray,
               query_dataset: BaseDataset,
               database_dataset: BaseDataset,
-              visual_dir: str = './LOGS/visualize',
+              visual_dir: str = 'logs/visualize',
               img_resize_size: Tuple = (320, 320)) -> None:
     if not os.path.exists(visual_dir):
         os.makedirs(visual_dir)
@@ -173,16 +174,18 @@ def visualize(top_k_matches: np.ndarray,
 
 def main():
     # load images
-    query_path = ''         # path to query images folder path
-    datasets_path = ''      # path to database images folder path
+    query_path = '/data/VCL/Nadhira/class/datasets/msls_val/test/athens/query/images'         # path to query images folder path
+    datasets_path = '/data/VCL/Nadhira/class/datasets/msls_val/test/athens/database/images'      # path to database images folder path
 
-    assert query_path == '' and datasets_path == '', 'Please specify the path to the query and datasets'
+    # assert query_path == '' and datasets_path == '', 'Please specify the path to the query and datasets'
 
     query_dataset = BaseDataset(query_path)
     database_dataset = BaseDataset(datasets_path)
 
     # load model
-    model = load_model('./LOGS/resnet50_MixVPR_4096_channels(1024)_rows(4).ckpt')
+    model_path = '/data/VCL/Nadhira/class/MixVPR/resnet50_MixVPR_4096_channels(1024)_rows(4).ckpt'
+    # model_path = '/data/VCL/Nadhira/class/MixVPR/resnet50_MixVPR_128_channels(64)_rows(2).ckpt'
+    model = load_model(model_path)
 
     # set up inference pipeline
     database_pipeline = InferencePipeline(model=model, dataset=database_dataset, feature_dim=4096)
@@ -196,10 +199,10 @@ def main():
     top_k_matches = calculate_top_k(q_matrix=query_global_descriptors, db_matrix=db_global_descriptors, top_k=10)
 
     # record query_database_matches
-    record_matches(top_k_matches, query_dataset, database_dataset, out_file='./LOGS/record.txt')
+    record_matches(top_k_matches, query_dataset, database_dataset, out_file='logs/record.txt')
 
     # visualize top-k matches
-    visualize(top_k_matches, query_dataset, database_dataset, visual_dir='./LOGS/visualize')
+    visualize(top_k_matches, query_dataset, database_dataset, visual_dir='logs/visualize')
 
 
 if __name__ == '__main__':
