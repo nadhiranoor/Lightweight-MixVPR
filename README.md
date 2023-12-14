@@ -48,7 +48,7 @@ Lightweight CNN Backbone following 3 Feature Extractor:
   </tr>
   <tr>
     <td>EfficientNet_b0</td>
-    <td>1280</td>
+    <td>128</td>
     <td>81.51</td>
     <td>91.83</td>
     <td>94.06</td>
@@ -59,7 +59,7 @@ Lightweight CNN Backbone following 3 Feature Extractor:
   </tr>
   <tr>
     <td>MobileNet v2</td>
-    <td>512</td>
+    <td>2048</td>
     <td>86.30</td>
     <td>92.99</td>
     <td>94.66</td>
@@ -70,7 +70,7 @@ Lightweight CNN Backbone following 3 Feature Extractor:
   </tr>
   <tr>
     <td>KD</td>
-    <td>256</td>
+    <td>1024</td>
     <td>89.00</td>
     <td>94.72</td>
     <td>96.07</td>
@@ -81,6 +81,54 @@ Lightweight CNN Backbone following 3 Feature Extractor:
   </tr>
 </tbody>
 </table>
+
+## Training
+
+Train MobileNetv2 & EfficientNet & ResNet
+
+```
+#Mobile Net
+backbone_arch='mobilenet_v2',
+pretrained=True,
+layers_to_freeze=2,
+layers_to_crop=[4], # 4 crops the last resnet layer, 3 crops the 3rd, ...etc
+
+
+agg_arch='MixVPR',
+agg_config={'in_channels' : 512,
+        'in_h' : 20,
+        'in_w' : 20,
+        'out_channels' : 256,
+        'mix_depth' : 4,
+        'mlp_ratio' : 1,
+        'out_rows' : 4}
+
+#EfficientNet_b0
+backbone_arch='efficientnet_b0',
+pretrained=True,
+layers_to_freeze=2,
+layers_to_crop=[4], # 4 crops the last resnet layer, 3 crops the 3rd, ...etc
+
+agg_arch='MixVPR',
+agg_config={'in_channels' : 1280,
+'in_h' : 10,
+'in_w' : 10,
+'out_channels' : 32,
+'mix_depth' : 4,
+'mlp_ratio' : 1,
+'out_rows' : 4}, 
+```
+
+```
+python main.py
+```
+
+Train Knowledge-Distillation
+```
+python kd_train.py
+```
+
+## Demo
 
 Code to load the pretrained weights is as follows:
 
