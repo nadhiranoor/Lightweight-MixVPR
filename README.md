@@ -1,16 +1,18 @@
 # Lightweight-MixVPR
 
 ### Summary
+![architecture](image/mainpipeline.png)
+Lightweight CNN Backbone following 3 Feature Extractor:
 
+1. EfficientNet
+2. MobileNetV2
+3. Knowledge-Distillation
 
+![kd-architecture](image/kd-pipeline.png)
 
-![architecture](image/README/1678217709949.png)
+- Teacher network: ResNet 50
+- Student network: ResNet18
 
-## Trained models
-
-All models have been trained on GSV-Cities dataset (https://github.com/amaralibey/gsv-cities).
-
-![performance](image/README/1678217802436.png)
 
 ### Weights
 
@@ -19,7 +21,6 @@ All models have been trained on GSV-Cities dataset (https://github.com/amaralibe
   <tr>
     <th rowspan="2">Backbone</th>
     <th rowspan="2">Output<br>dimension</th>
-    <th colspan="3">Pitts250k-test</th>
     <th colspan="3">Pitts30k-test</th>
     <th colspan="3">MSLS-val</th>
     <th rowspan="2">DOWNLOAD<br></th>
@@ -31,53 +32,52 @@ All models have been trained on GSV-Cities dataset (https://github.com/amaralibe
     <th>R@1</th>
     <th>R@5</th>
     <th>R@10</th>
-    <th>R@1</th>
-    <th>R@5</th>
-    <th>R@10</th>
   </tr>
 </thead>
 <tbody>
   <tr>
-    <td>ResNet50</td>
+    <td>ResNet50 (MixVPR)</td>
     <td>4096</td>
-    <td>94.3</td>
-    <td>98.2</td>
-    <td>98.9</td>
-    <td>91.6</td>
-    <td>95.5</td>
-    <td>96.4</td>
-    <td>88.2</td>
-    <td>93.1</td>
-    <td>94.3</td>
-    <td><a href="https://drive.google.com/file/d/1vuz3PvnR7vxnDDLQrdHJaOA04SQrtk5L/view?usp=share_link">LINK</a></td>
+    <td>91.99</td>
+    <td>95.79</td>
+    <td>96.66</td>
+    <td>87.03</td>
+    <td>92.57</td>
+    <td>94.73</td>
+    <td><a href="https://drive.google.com/file/d/1ZmmTGn_8upcJ5huXS42_Yq-vHd8Bxo_v/view?usp=drive_link">LINK</a></td>
   </tr>
- <tr>
-    <td>ResNet50</td>
+  <tr>
+    <td>EfficientNet_b0</td>
+    <td>1280</td>
+    <td>81.51</td>
+    <td>91.83</td>
+    <td>94.06</td>
+    <td>65.00</td>
+    <td>78.38</td>
+    <td>81.89</td>
+    <td><a href="https://drive.google.com/file/d/1FKG3Q4JlmN3i0FcixZYZXuEtVySmVW1_/view?usp=drive_link">LINK</a></td>
+  </tr>
+  <tr>
+    <td>MobileNet v2</td>
     <td>512</td>
-    <td>93.2</td>
-    <td>97.9</td>
-    <td>98.6</td>
-    <td>90.7</td>
-    <td>95.5</td>
-    <td>96.3</td>
-    <td>84.1</td>
-    <td>91.8</td>
-    <td>93.7</td>
-    <td><a href="https://drive.google.com/file/d/1khiTUNzZhfV2UUupZoIsPIbsMRBYVDqj/view?usp=share_link">LINK</a></td>
+    <td>86.30</td>
+    <td>92.99</td>
+    <td>94.66</td>
+    <td>70.14</td>
+    <td>81.35</td>
+    <td>83.65</td>
+    <td><a href="https://drive.google.com/file/d/1zwumBOinylXe77KwDhZjUffwxGLyx3s9/view?usp=drive_link">LINK</a></td>
   </tr>
-<tr>
-    <td>ResNet50</td>
-    <td>128</td>
-    <td>88.7</td>
-    <td>95.8</td>
-    <td>97.4</td>
-    <td>87.8</td>
-    <td>94.3</td>
-    <td>95.7</td>
-    <td>78.5</td>
-    <td>88.2</td>
-    <td>90.4</td>
-    <td><a href="https://drive.google.com/file/d/1DQnefjk1hVICOEYPwE4-CZAZOvi1NSJz/view?usp=share_link">LINK</a></td>
+  <tr>
+    <td>KD</td>
+    <td>256</td>
+    <td>89.00</td>
+    <td>94.72</td>
+    <td>96.07</td>
+    <td>81.49</td>
+    <td>88.92</td>
+    <td>91.22</td>
+    <td><a href="https://drive.google.com/file/d/1C3dLL5-IVEuLKWp5laZAwiEwP2feQw9J/view?usp=drive_link">LINK</a></td>
   </tr>
 </tbody>
 </table>
@@ -104,6 +104,13 @@ state_dict = torch.load('./LOGS/resnet50_MixVPR_4096_channels(1024)_rows(4).ckpt
 model.load_state_dict(state_dict)
 model.eval()
 ```
+
+code to rune Demo (demo_query.py)
+
+```
+python demo_query.py --model [backbone model] --query [path to query] --database [path to database]
+```
+
 
 ## Bibtex
 
